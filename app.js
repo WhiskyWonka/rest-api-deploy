@@ -1,89 +1,15 @@
 import express, { json } from 'express';
-import { randomUUID } from 'crypto';
+import { moviesRouter } from './routes/movies.js';
+import { corsMiddleware } from './middlewares/cors.js';
 
 const app = express();
 app.disable('x-powered-by');
 
-import movies from './movies.json' assert { type: "json" };
-import { validateMovie, validatePartialMovie } from './schemes/movieSchema.js';
-
 app.use(json());
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // esto habilita que cualquier origen (dominio) pueda hacer peticiones a nuestra API
-    next();
-});
+app.use('/movies', moviesRouter);
+app.use(corsMiddleware());
 
-app.get('/movies', (req, res) => {
-
-  const {genre} = req.query;
-
-  if (genre) {
-    const filteredMovies = movies.filter(movie => movie.genre.some(g => g.toLowerCase() === genre.toLowerCase()));
-    return res.json(filteredMovies);
-  }
-  res.json(movies);
-});
-
-app.get('/movies/:id', (req, res) => {
-    const {id} = req.params;
-    console.log('id', id);
-    const movie = movies.find(movie => movie.id == id);
-
-    if (movie) {
-        res.json(movie);
-    }
-
-    res.status(404).json({
-        message: 'Not found'
-    });
-});
-
-app.post('/movies', (req, res) => {
-  
-  const result = validateMovie(req.body);
-
-  if (result.error) {
-    return res.status(400).json({
-      message: JSON.parse(result.error.message),
-    });
-  }
-
-  const newMovie = {
-      id: randomUUID(),
-      ...result.data
-  };
-
-  movies.push(newMovie);
-
-  res.status(201).json(newMovie);
-} );
-
-app.patch('/movies/:id', (req, res) => {
-    const {id} = req.params;
-    const movieIndex = movies.findIndex(movie => movie.id == id);
-
-    if (movieIndex === -1) {
-        return res.status(404).json({
-            message: 'Not found'
-        });
-    }
-
-    const result = validatePartialMovie(req.body);
-
-    if (result.error) {
-        return res.status(400).json({
-            message: JSON.parse(result.error.message),
-        });
-    }
-
-    movies[movieIndex] = {
-        ...movies[movieIndex],
-        ...result.data
-    };
-
-    res.json(movies[movieIndex]);
-});
 // 404
 app.use((req, res) => {
     res.status(404).json({

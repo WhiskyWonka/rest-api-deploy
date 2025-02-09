@@ -24,14 +24,14 @@ const movieSchema = z.object({
   poster: z.string({
     required_error: 'Poster is required',
     invalid_type_error: 'Poster must be a url'
-  }).url().endsWith('.png'),
+  }).url(),
 
   rate: z.number({
     invalid_type_error: 'Rate must be a number'
   }).min(0).max(10).default(0),
 
   genre: z.array(
-    z.enum(['action', 'comedy', 'drama', 'horror', 'romance', 'thriller', 'western', 'animation', 'documentary', 'sci-fi', 'fantasy', 'mystery', 'crime', 'adventure', 'family', 'superhero', 'musical', 'war', 'historical', 'biography', 'sport', 'music', 'spy', 'disaster', 'zombie', 'monster', 'alien', 'post-apocalyptic', 'cyberpunk', 'steampunk', 'time-travel', 'dystopian', 'slasher', 'mockumentary', 'found-footage', 'silent', 'epic', 'surreal', 'satire', 'parody', 'black-comedy', 'dark-comedy', 'romantic-comedy', 'slapstick', 'screwball', 'gross-out']),
+    z.enum(['Action', 'Comedy', 'Drama', 'Horror', 'Romance', 'Thriller', 'Western', 'Animation', 'Documentary', 'Sci-Fi', 'Fantasy', 'Mystery', 'Crime', 'Adventure', 'Family', 'Superhero', 'Musical', 'War', 'Historical', 'Biography', 'Sport', 'Music', 'Spy', 'Disaster', 'Zombie', 'Monster', 'Alien', 'Post-Apocalyptic', 'Cyberpunk', 'Steampunk', 'Time-Travel', 'Dystopian', 'Slasher', 'Mockumentary', 'Found-Footage', 'Silent', 'Epic', 'Surreal', 'Satire', 'Parody', 'Black-Comedy', 'Dark-Comedy', 'Romantic-Comedy', 'Slapstick', 'Screwball', 'Gross-Out']),
     {
     required_error: 'Genre is required',
     invalid_type_error: 'Genre must be an array of strings', 
