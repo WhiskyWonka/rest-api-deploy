@@ -1,58 +1,97 @@
-const express = require('express');
+const express  = require('express');
+const crypto = require('crypto');
 
 const app = express();
-app.disable('x-powered-by'); // esto es por seguridad para que no sepan que estamos usando express
+app.disable('x-powered-by');
 
-const dittoJSON = require('./pokemon/ditto.json');
+const movies = require('./movies.json');
+const  {validateMovie, validatePartialMovie} = require('./schemes/movieSchema');
 
-const PORT = process.env.PORT || 3000;
-
-// ejemplo de middleware para todas las rutas y todos los metodos
-// app.use((req, res, next) => {
-//   if (req.method !== 'POST') return next();
-//   if (req.headers['content-type'] !== 'application/json') return next();
-
-//   let body = '';
-
-//   req.on('data', (chunk) => {
-//     body += chunk.toString();
-//   });
-
-//   req.on('end', () => {
-//     const data = JSON.parse(body);
-
-//     req.body = data;
-//     next();
-//   });
-
-// });
-
-// lo mismo que hace el ejemlo de arriba ya lo hace solo express
 app.use(express.json());
 
-app.get('/pokemon/ditto', (req, res) => {
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.end(JSON.stringify(dittoJSON));
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // esto habilita que cualquier origen (dominio) pueda hacer peticiones a nuestra API
+    next();
 });
 
-app.post('/pokemon', (req, res) => {
-  const { url } = req;
+app.get('/movies', (req, res) => {
 
-  switch (url) {
-    case '/pokemon':
-      res.status(201).json(req.body);
-      break;
-    default:
-      res.setStatusCode = 404;
-      return res.end('Not Found');
+  const {genre} = req.query;
+
+  if (genre) {
+    const filteredMovies = movies.filter(movie => movie.genre.some(g => g.toLowerCase() === genre.toLowerCase()));
+    return res.json(filteredMovies);
+  }
+  res.json(movies);
+});
+
+app.get('/movies/:id', (req, res) => {
+    const {id} = req.params;
+    console.log('id', id);
+    const movie = movies.find(movie => movie.id == id);
+
+    if (movie) {
+        res.json(movie);
+    }
+
+    res.status(404).json({
+        message: 'Not found'
+    });
+});
+
+app.post('/movies', (req, res) => {
+  
+  const result = validateMovie(req.body);
+
+  if (result.error) {
+    return res.status(400).json({
+      message: JSON.parse(result.error.message),
+    });
   }
 
-});
+  const newMovie = {
+      id: crypto.randomUUID(),
+      ...result.data
+  };
 
+  movies.push(newMovie);
+
+  res.status(201).json(newMovie);
+} );
+
+app.patch('/movies/:id', (req, res) => {
+    const {id} = req.params;
+    const movieIndex = movies.findIndex(movie => movie.id == id);
+
+    if (movieIndex === -1) {
+        return res.status(404).json({
+            message: 'Not found'
+        });
+    }
+
+    const result = validatePartialMovie(req.body);
+
+    if (result.error) {
+        return res.status(400).json({
+            message: JSON.parse(result.error.message),
+        });
+    }
+
+    movies[movieIndex] = {
+        ...movies[movieIndex],
+        ...result.data
+    };
+
+    res.json(movies[movieIndex]);
+});
+// 404
 app.use((req, res) => {
-  res.status(404).end('Not Found');
+    res.status(404).json({
+        message: 'Not found'
+    });
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
