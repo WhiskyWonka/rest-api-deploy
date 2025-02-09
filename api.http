@@ -1,14 +1,30 @@
-GET http://localhost:3000/pokemon/ditto
+### Recuperar todas las peliculas de la base de datos
+GET http://localhost:3000/movies
 
-### crear un pokemon
-POST http://localhost:3000/pokemon
+### Recuperar una pelicula por su id
+GET http://localhost:3000/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+
+### Recuperar peliculas por genero
+GET http://localhost:3000/movies?genre=sci-Fi
+
+### Crear una pellicula con POST 
+POST http://localhost:3000/movies
 Content-Type: application/json
 
 {
-    "name": "pikachu",
-    "type": "electric",
-    "moves": [
-      "thunderbolt",
-      "quick attack"
-    ]
+  "title": "Marisa y Gomoso",
+  "year": 2023,
+  "director": "Pablo Parés",
+  "duration": 84,
+  "poster": "https://pics.filmaffinity.com/marisa_y_gomoso-674787128-large.png",
+  "genre": ["comedy"],
+  "rate": 10.0
+}
+
+### Actualiza un dato de una pelicula por su id
+PATCH http://localhost:3000/movies/9e6106f0-848b-4810-a11a-3d832a5610f9
+Content-Type: application/json
+
+{
+  "rate": 9.0
 }
