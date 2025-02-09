@@ -1,13 +1,13 @@
-const express  = require('express');
-const crypto = require('crypto');
+import express, { json } from 'express';
+import { randomUUID } from 'crypto';
 
 const app = express();
 app.disable('x-powered-by');
 
-const movies = require('./movies.json');
-const  {validateMovie, validatePartialMovie} = require('./schemes/movieSchema');
+import movies from './movies.json' assert { type: "json" };
+import { validateMovie, validatePartialMovie } from './schemes/movieSchema.js';
 
-app.use(express.json());
+app.use(json());
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*'); // esto habilita que cualquier origen (dominio) pueda hacer peticiones a nuestra API
@@ -50,7 +50,7 @@ app.post('/movies', (req, res) => {
   }
 
   const newMovie = {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       ...result.data
   };
 
