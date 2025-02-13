@@ -31,7 +31,7 @@ const movieSchema = z.object({
   }).min(0).max(10).default(0),
 
   genre: z.array(
-    z.enum(['Action', 'Comedy', 'Drama', 'Horror', 'Romance', 'Thriller', 'Western', 'Animation', 'Documentary', 'Sci-Fi', 'Fantasy', 'Mystery', 'Crime', 'Adventure', 'Family', 'Superhero', 'Musical', 'War', 'Historical', 'Biography', 'Sport', 'Music', 'Spy', 'Disaster', 'Zombie', 'Monster', 'Alien', 'Post-Apocalyptic', 'Cyberpunk', 'Steampunk', 'Time-Travel', 'Dystopian', 'Slasher', 'Mockumentary', 'Found-Footage', 'Silent', 'Epic', 'Surreal', 'Satire', 'Parody', 'Black-Comedy', 'Dark-Comedy', 'Romantic-Comedy', 'Slapstick', 'Screwball', 'Gross-Out']),
+    z.enum(['Action', 'Adventure', 'Animation', 'Biography', 'Crime', 'Drama', 'Fantasy', 'Romance', 'Sci-Fi']),
     {
     required_error: 'Genre is required',
     invalid_type_error: 'Genre must be an array of strings', 

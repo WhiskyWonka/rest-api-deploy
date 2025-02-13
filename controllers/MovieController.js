@@ -1,9 +1,18 @@
-import {MovieModel} from '../models/movie.js';
+import {MovieModel} from '../models/mysql/movie.js';
 import { validateMovie, validatePartialMovie } from '../schemes/movieSchema.js';
 
 export class MovieController {
   static async getAll(req, res) {
+    const result = validatePartialMovie(req.body);
+
+    if (result.error) {
+        return res.status(400).json({
+            message: JSON.parse(result.error.message),
+        });
+    }
+    
     const {genre} = req.query;
+
     const movies = await MovieModel.getAll({genre});
     return res.json(movies);
   }
@@ -36,17 +45,6 @@ export class MovieController {
   }
 
   static async update(req, res) {
-    const {id} = req.params;
-
-    const movie = await MovieModel.getById({id});
-
-
-    if (movie === null) {
-        return res.status(404).json({
-            message: 'Not found'
-        });
-    }
-
     const result = validatePartialMovie(req.body);
 
     if (result.error) {
@@ -55,7 +53,19 @@ export class MovieController {
         });
     }
 
+    const {id} = req.params;
+
     const movieUpdate = await MovieModel.update({id, input: result.data});
+
+    if (movieUpdate === null) {
+      return res.status(404).json({
+          message: 'Not found'
+      });
+    }
+
+    if (req.body.genres) {
+      console.log("actualizar generos");
+    }
 
     res.json(movieUpdate);
   }
